@@ -49,10 +49,14 @@ public class JavaFormatterOptions {
 
   private final Style style;
   private final boolean formatJavadoc;
+  private final int maxCodeLineLength;
+  private final int maxJavaDocLineLength;
 
-  private JavaFormatterOptions(Style style, boolean formatJavadoc) {
+  private JavaFormatterOptions(Style style, boolean formatJavadoc, int maxCodeLineLength, int maxJavaDocLineLength) {
     this.style = style;
     this.formatJavadoc = formatJavadoc;
+    this.maxCodeLineLength = maxCodeLineLength;
+    this.maxJavaDocLineLength = maxJavaDocLineLength;
   }
 
   /** Returns the multiplier for the unit of indent. */
@@ -69,6 +73,14 @@ public class JavaFormatterOptions {
     return style;
   }
 
+  public int maxCodeLineLength() {
+    return maxCodeLineLength;
+  }
+
+  public int maxJavaDocLineLength() {
+    return maxJavaDocLineLength;
+  }
+
   /** Returns the default formatting options. */
   public static JavaFormatterOptions defaultOptions() {
     return builder().build();
@@ -83,6 +95,8 @@ public class JavaFormatterOptions {
   public static class Builder {
     private Style style = Style.GOOGLE;
     private boolean formatJavadoc = true;
+    private int maxCodeLineLength = Formatter.MAX_LINE_LENGTH_ALL;
+    private int maxJavaDocLineLength = Formatter.MAX_LINE_LENGTH_ALL;
 
     private Builder() {}
 
@@ -96,8 +110,18 @@ public class JavaFormatterOptions {
       return this;
     }
 
+    public Builder maxCodeLineLength(int length) {
+      this.maxCodeLineLength = length;
+      return this;
+    }
+
+    public Builder maxJavaDocLineLength(int length) {
+      this.maxJavaDocLineLength = length;
+      return this;
+    }
+
     public JavaFormatterOptions build() {
-      return new JavaFormatterOptions(style, formatJavadoc);
+      return new JavaFormatterOptions(style, formatJavadoc, maxCodeLineLength, maxJavaDocLineLength);
     }
   }
 }

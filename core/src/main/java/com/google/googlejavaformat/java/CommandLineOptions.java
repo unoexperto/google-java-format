@@ -43,6 +43,8 @@ final class CommandLineOptions {
   private final Optional<String> assumeFilename;
   private final boolean reflowLongStrings;
   private final boolean formatJavadoc;
+  private final int maxCodeLineLength;
+  private final int maxJavaDocLineLength;
 
   CommandLineOptions(
       ImmutableList<String> files,
@@ -61,7 +63,9 @@ final class CommandLineOptions {
       boolean setExitIfChanged,
       Optional<String> assumeFilename,
       boolean reflowLongStrings,
-      boolean formatJavadoc) {
+      boolean formatJavadoc,
+      int maxCodeLineLength,
+      int maxJavaDocLineLength) {
     this.files = files;
     this.inPlace = inPlace;
     this.lines = lines;
@@ -79,6 +83,8 @@ final class CommandLineOptions {
     this.assumeFilename = assumeFilename;
     this.reflowLongStrings = reflowLongStrings;
     this.formatJavadoc = formatJavadoc;
+    this.maxCodeLineLength = maxCodeLineLength;
+    this.maxJavaDocLineLength = maxJavaDocLineLength;
   }
 
   /** The files to format. */
@@ -167,6 +173,14 @@ final class CommandLineOptions {
     return !lines().isEmpty() || !offsets().isEmpty() || !lengths().isEmpty();
   }
 
+  int maxCodeLineLength() {
+    return maxCodeLineLength;
+  }
+
+  int maxJavaDocLineLength() {
+    return maxJavaDocLineLength;
+  }
+
   boolean formatJavadoc() {
     return formatJavadoc;
   }
@@ -194,6 +208,8 @@ final class CommandLineOptions {
     private Optional<String> assumeFilename = Optional.empty();
     private boolean reflowLongStrings = true;
     private boolean formatJavadoc = true;
+    private int maxCodeLineLength = Formatter.MAX_LINE_LENGTH_ALL;
+    private int maxJavaDocLineLength = Formatter.MAX_LINE_LENGTH_ALL;
 
     ImmutableList.Builder<String> filesBuilder() {
       return files;
@@ -278,6 +294,16 @@ final class CommandLineOptions {
       return this;
     }
 
+    Builder addMaxCodeLineLength(int length) {
+      maxCodeLineLength = length;
+      return this;
+    }
+
+    Builder addMaxJavaDocLineLength(int length) {
+      maxJavaDocLineLength = length;
+      return this;
+    }
+
     CommandLineOptions build() {
       return new CommandLineOptions(
           files.build(),
@@ -296,7 +322,9 @@ final class CommandLineOptions {
           setExitIfChanged,
           assumeFilename,
           reflowLongStrings,
-          formatJavadoc);
+          formatJavadoc,
+          maxCodeLineLength,
+          maxJavaDocLineLength);
     }
   }
 }
