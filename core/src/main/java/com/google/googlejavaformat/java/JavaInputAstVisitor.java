@@ -845,6 +845,11 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       members.add(member);
     }
     if (enumConstants.isEmpty() && members.isEmpty()) {
+      builder.open(ZERO);
+      builder.blankLineWanted(BlankLineWanted.NO);
+      token("}");
+      builder.close();
+      /* // ruslan
       if (builder.peekToken().equals(Optional.of(";"))) {
         builder.open(plusTwo);
         builder.forcedBreak();
@@ -863,6 +868,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         token("}");
         builder.close();
       }
+      */
     } else {
       builder.open(plusTwo);
       builder.blankLineWanted(BlankLineWanted.NO);
@@ -954,6 +960,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
           annotationDirection,
           Optional.of(fragment.getModifiers()),
           fragment.getType(),
+          VarArgsOrNot.fromVariable(fragment), ImmutableList.of(), // ruslan
           /* name= */ fragment.getName(),
           "",
           "=",
@@ -1882,6 +1889,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
               fieldAnnotationDirection(variableTree.getModifiers()),
               Optional.of(variableTree.getModifiers()),
               variableTree.getType(),
+              VarArgsOrNot.NO, ImmutableList.of(), // ruslan
               /* name= */ variableTree.getName(),
               "",
               "=",
@@ -2325,6 +2333,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         Direction.HORIZONTAL,
         /* modifiers= */ Optional.empty(),
         last,
+        VarArgsOrNot.NO, ImmutableList.of(), // ruslan
         /* name= */ declaration.getName(),
         /* op= */ "",
         "=",
@@ -2369,6 +2378,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
           Direction.HORIZONTAL,
           Optional.of(receiver.get().getModifiers()),
           receiver.get().getType(),
+          VarArgsOrNot.NO, ImmutableList.of(), // ruslan
           /* name= */ receiver.get().getName(),
           "",
           "",
@@ -2565,6 +2575,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         annotationsDirection,
         Optional.of(node.getModifiers()),
         extractedDims.node,
+        VarArgsOrNot.valueOf(VarArgsOrNot.fromVariable(node).isYes()), // ruslan
+        ImmutableList.of(), // ruslan
         node.getName(),
         "",
         equals,
@@ -3238,6 +3250,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       Direction annotationsDirection,
       Optional<ModifiersTree> modifiers,
       Tree type,
+      VarArgsOrNot isVarargs, // ruslan
+      List<? extends AnnotationTree> varargsAnnotations, // ruslan
       Name name,
       String op,
       String equals,
@@ -3293,6 +3307,10 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             } else {
               scan(type, null);
             }
+          }
+          if (isVarargs.isYes()) { // ruslan
+            this.visitAnnotations(varargsAnnotations, BreakOrNot.YES, BreakOrNot.YES);
+            this.builder.op("...");
           }
           builder.close();
 
@@ -3393,6 +3411,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             scan(dimExpressions.removeFirst(), null);
           }
           token("]");
+          /* // ruslan
           lastWasAnnotation = false;
           break;
         case ".":
@@ -3405,6 +3424,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             builder.breakToFill();
           }
           builder.op("...");
+          */
           lastWasAnnotation = false;
           break;
         default:
